@@ -28,7 +28,7 @@ class MangaReader(Manga):
             return self.NEW_SERIES_URL % d
 
     def get_chapter_url(self, data):
-        if 'series_id' in data:
+        if 'chapter_id' in data:
             return Manga.get_chapter_url(self, data)
         else:
             d = data
@@ -36,7 +36,7 @@ class MangaReader(Manga):
             return self.NEW_CHAPTER_URL % d
 
     def get_page_url(self, data):
-        if 'series_id' in data:
+        if 'chapter_id' in data:
             return Manga.get_page_url(self, data)
         else:
             d = data
