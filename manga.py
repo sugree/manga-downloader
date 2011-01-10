@@ -8,9 +8,13 @@ import zipfile
 
 from lxml import etree as ET
 
+user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+
 def urlopen(*args):
     try:
-        ret = urllib2.urlopen(*args)
+        headers = {'User-Agent': user_agent}
+        req = urllib2.Request(*args, headers=headers)
+        ret = urllib2.urlopen(req)
     except httplib.BadStatusLine, why:
         print httplib.BadStatusLine, args
         ret = urlopen(*args)
