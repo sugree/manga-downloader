@@ -11,9 +11,9 @@ class MangaFox(Manga):
     PAGE_URL = '%(baseurl)s/manga/%(series)s/v%(volume)02d/c%(chapter)s/%(page)d.html'
 
     CHAPTER_PATTERN = '%(series)s-v%(volume)02d-c%(chapter)s.cbz'
-    PAGE_PATTERN = '%(series)s-v%(volume)02d-c%(chapter)s-%(page)02d.jpg'
+    PAGE_PATTERN = '%(series)s-v%(volume)02d-c%(chapter)s-%(page)02d'
 
-    CHAPTER_CRE = re.compile(r'/manga/[^/]+/v(\d+)/c([0-9\.]+)/')
+    CHAPTER_CRE = re.compile(r'/manga/[^/]+/v(\d+)/c([0-9.]+)/')
 
     def __init__(self):
         Manga.__init__(self, 'http://www.mangafox.com')
