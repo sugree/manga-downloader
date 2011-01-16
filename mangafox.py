@@ -7,13 +7,13 @@ from manga import Manga, App
 class MangaFox(Manga):
 
     SERIES_URL = '%(baseurl)s/manga/%(series)s/?no_warning=1'
-    CHAPTER_URL = '%(baseurl)s/manga/%(series)s/v%(volume)02d/c%(chapter)03d/'
-    PAGE_URL = '%(baseurl)s/manga/%(series)s/v%(volume)02d/c%(chapter)03d/%(page)d.html'
+    CHAPTER_URL = '%(baseurl)s/manga/%(series)s/v%(volume)02d/c%(chapter)s/'
+    PAGE_URL = '%(baseurl)s/manga/%(series)s/v%(volume)02d/c%(chapter)s/%(page)d.html'
 
-    CHAPTER_PATTERN = '%(series)s-v%(volume)02d-c%(chapter)03d.cbz'
-    PAGE_PATTERN = '%(series)s-v%(volume)02d-c%(chapter)03d-%(page)02d.jpg'
+    CHAPTER_PATTERN = '%(series)s-v%(volume)02d-c%(chapter)s.cbz'
+    PAGE_PATTERN = '%(series)s-v%(volume)02d-c%(chapter)s-%(page)02d.jpg'
 
-    CHAPTER_CRE = re.compile(r'/manga/[^/]+/v(\d+)/c(\d+)/')
+    CHAPTER_CRE = re.compile(r'/manga/[^/]+/v(\d+)/c([0-9\.]+)/')
 
     def __init__(self):
         Manga.__init__(self, 'http://www.mangafox.com')
@@ -24,7 +24,7 @@ class MangaFox(Manga):
             u = n.xpath("td[1]/a[@class='chico']")[0].attrib['href']
             m = self.CHAPTER_CRE.match(u)
             chapters.append({'volume': int(m.group(1)),
-                             'chapter': int(m.group(2))})
+                             'chapter': m.group(2)})
         return chapters
 
     def _list_pages(self, doc):
