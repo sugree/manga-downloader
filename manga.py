@@ -12,7 +12,9 @@ user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 def urlopen(*args):
     try:
-        headers = {'User-Agent': user_agent}
+        headers = {'User-Agent': user_agent,
+                   'Referer': args[0],
+                   'Connection': 'close'}
         req = urllib2.Request(*args, headers=headers)
         ret = urllib2.urlopen(req)
     except httplib.BadStatusLine, why:
