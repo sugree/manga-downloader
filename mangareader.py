@@ -46,7 +46,7 @@ class MangaReader(Manga):
     def _list_chapters(self, doc):
         chapters = []
         for n in doc.xpath("//table[@id='listing']/tr[position()>1]"):
-            u = n.xpath("td[1]/a[@class='chico']")[0].attrib['href']
+            u = n.xpath("td[1]/a")[0].attrib['href']
             m = self.CHAPTER_CRE_1.match(u)
             if m:
                 chapters.append({'series_id': int(m.group(1)),
