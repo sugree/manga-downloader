@@ -14,6 +14,9 @@ def urlopen(*args):
     try:
         headers = {'User-Agent': user_agent,
                    'Referer': args[0],
+                   'Accept': 'text/html,application/xhtml+xml,application/xml',
+                   'Accept-Encoding': 'identity',
+                   'Accept-Charset': 'utf-8',
                    'Connection': 'close'}
         req = urllib2.Request(*args, headers=headers)
         ret = urllib2.urlopen(req)
