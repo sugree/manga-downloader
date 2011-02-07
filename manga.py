@@ -9,6 +9,7 @@ import zipfile
 from lxml import etree as ET
 
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+http_timeout = 60
 
 def urlopen(*args):
     try:
@@ -19,7 +20,7 @@ def urlopen(*args):
                    'Accept-Charset': 'utf-8',
                    'Connection': 'close'}
         req = urllib2.Request(*args, headers=headers)
-        ret = urllib2.urlopen(req)
+        ret = urllib2.urlopen(req, timeout=http_timeout)
     except httplib.BadStatusLine, why:
         print httplib.BadStatusLine, args
         ret = urlopen(*args)
