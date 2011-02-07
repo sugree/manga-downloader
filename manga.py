@@ -28,16 +28,16 @@ def urlopen(*args):
         ret = urlopen(*args)
     return ret
 
-def extract_list(s, last):
+def extract_list(s, last, extract_range=True, func=int):
     l = []
     for i in s.split(','):
         if i.endswith('+'):
             l.extend(range(int(i[:-1]), last+1))
-        elif '-' in i:
+        elif extract_range and '-' in i:
             s, e = i.split('-')
             l.extend(range(int(s), int(e)+1))
         elif i:
-            l.append(int(i))
+            l.append(func(i))
     return l
 
 class Manga:
@@ -144,11 +144,13 @@ class Manga:
             os.unlink(filename)
 
 class App:
-    def __init__(self):
+    def __init__(self, extract_range=True, chapter_func=int):
         parser = OptionParser()
         self._parse_args(parser)
         self.options, self.args = parser.parse_args()
         self.series = self.args[0]
+        self.extract_range = extract_range
+        self.chapter_func = chapter_func
 
         self.data = {'series': self.series}
 
@@ -167,7 +169,9 @@ class App:
         chapters = self.manga.list_chapters(self.data)
         print chapters[0], chapters[-1]
         self.chapters = extract_list(self.options.chapter,
-                                     chapters[-1]['chapter'])
+                                     chapters[-1]['chapter'],
+                                     self.extract_range,
+                                     self.chapter_func)
         for data in chapters:
             if self.chapters and data['chapter'] not in self.chapters:
                 continue
