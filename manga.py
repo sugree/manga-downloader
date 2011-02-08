@@ -11,14 +11,15 @@ from lxml import etree as ET
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 http_timeout = 60
 
-def urlopen(*args):
+def urlopen(*args, **kwargs):
     try:
         headers = {'User-Agent': user_agent,
-                   'Referer': args[0],
-                   'Accept': 'text/html,application/xhtml+xml,application/xml',
+                   'Referer': kwargs.get('referer', args[0]),
+                   'Accept': 'text/html,application/xhtml+xml,application/xml,image/jpeg,image/png',
                    'Accept-Encoding': 'identity',
                    'Accept-Charset': 'utf-8',
                    'Connection': 'close'}
+        headers.update(kwargs.get('headers', {}))
         req = urllib2.Request(*args, headers=headers)
         ret = urllib2.urlopen(req, timeout=http_timeout)
     except httplib.BadStatusLine, why:
@@ -49,8 +50,9 @@ class Manga:
     CHAPTER_PATTERN = '%(series)s-%(chapter)03d.cbz'
     PAGE_PATTERN = '%(series)s-%(chapter)03d-%(page)02d'
 
-    def __init__(self, baseurl):
+    def __init__(self, baseurl, http_headers={}):
         self.baseurl = baseurl
+        self.http_headers = http_headers
 
     def get_series_url(self, data):
         d = data
@@ -79,7 +81,7 @@ class Manga:
 
     def list_chapters(self, data):
         url = self.get_series_url(data)
-        f = urlopen(url)
+        f = urlopen(url, headers=self.http_headers)
         doc = ET.HTML(f.read())
         chapters = self._list_chapters(doc)
         chapters.sort(lambda a, b: cmp(a['chapter'], b['chapter']))
@@ -87,7 +89,7 @@ class Manga:
 
     def list_pages(self, data):
         url = self.get_chapter_url(data)
-        f = urlopen(url)
+        f = urlopen(url, headers=self.http_headers)
         doc = ET.HTML(f.read())
         pages = self._list_pages(doc)
         pages.sort()
@@ -95,12 +97,12 @@ class Manga:
 
     def download_page(self, data):
         url = self.get_page_url(data)
-        f = urlopen(url)
+        f = urlopen(url, headers=self.http_headers)
         doc = ET.HTML(f.read())
         img_url = self._download_page(doc)
         filename = self.get_page_filename(data)
         filename += os.path.splitext(img_url)[-1].lower()
-        fi = urlopen(img_url)
+        fi = urlopen(img_url, referer=url, headers=self.http_headers)
         fo = open(filename, 'wb')
         fo.write(fi.read())
         fo.close()
