@@ -5,11 +5,12 @@ import urllib
 import urllib2
 import httplib
 import zipfile
+import socket
 
 from lxml import etree as ET
 
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-http_timeout = 60
+http_timeout = 90
 
 def urlopen(*args, **kwargs):
     try:
@@ -29,6 +30,15 @@ def urlopen(*args, **kwargs):
         print why, args
         ret = urlopen(*args)
     return ret
+
+def urlretrieve(*args, **kwargs):
+    try:
+        f = urlopen(*args, **kwargs)
+        content = f.read()
+    except socket.timeout, why:
+        print why, args
+        content = urlretrieve(*args, **kwargs)
+    return content
 
 def extract_list(s, last, extract_range=True, func=int):
     l = []
@@ -102,8 +112,9 @@ class Manga:
         img_url = self._download_page(doc)
         filename = self.get_page_filename(data)
         filename += os.path.splitext(img_url)[-1].lower()
-        fi = urlopen(img_url, referer=url, headers=self.http_headers)
-        content = fi.read()
+#        fi = urlopen(img_url, referer=url, headers=self.http_headers)
+#        content = fi.read()
+        content = urlretrieve(img_url, referer=url, headers=self.http_headers)
         fo = open(filename, 'wb')
         fo.write(content)
         fo.close()

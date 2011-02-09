@@ -6,7 +6,7 @@ from urllib import unquote_plus
 
 from lxml import etree as ET
 
-from manga import Manga, App, urlopen
+from manga import Manga, App, urlopen, urlretrieve
 
 class Doujins(Manga):
     SERIES_URL = '%(baseurl)s/search.php?series=%(series)s&page=1'
@@ -41,8 +41,7 @@ class Doujins(Manga):
         img_url = self._download_page(doc)
         filename = self.get_page_filename(data)
         filename += os.path.splitext(img_url)[-1].split('&')[0].lower()
-        fi = urlopen(img_url)
-        content = fi.read()
+        content = urlretrieve(img_url)
         fo = open(filename, 'wb')
         fo.write(content)
         fo.close()

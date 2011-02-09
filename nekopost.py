@@ -37,8 +37,7 @@ class NekoPost(Manga):
         img_url = self.page_url+self.page_map[data['page']]
         filename = self.get_page_filename(data)
         filename += os.path.splitext(img_url)[-1].lower()
-        fi = urlopen(img_url)
-        content = fi.read()
+        content = urlretrieve(img_url)
         fo = open(filename, 'wb')
         fo.write(content)
         fo.close()
