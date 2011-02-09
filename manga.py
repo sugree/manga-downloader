@@ -52,6 +52,24 @@ def extract_list(s, last, extract_range=True, func=int):
             l.append(func(i))
     return l
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
+try:
+    from PIL import Image
+    def verify_image(s, uri):
+        try:
+            Image.open(StringIO(s))
+        except IOError, why:
+            print why, uri
+            return False
+        return True
+except ImportError:
+    def verify_image(s, uri):
+        return True
+
 class Manga:
     SERIES_URL = ''
     CHAPTER_URL = ''
@@ -114,7 +132,10 @@ class Manga:
         filename += os.path.splitext(img_url)[-1].lower()
 #        fi = urlopen(img_url, referer=url, headers=self.http_headers)
 #        content = fi.read()
-        content = urlretrieve(img_url, referer=url, headers=self.http_headers)
+        while True:
+            content = urlretrieve(img_url, referer=url, headers=self.http_headers)
+            if verify_image(content, img_url):
+                break
         fo = open(filename, 'wb')
         fo.write(content)
         fo.close()
@@ -134,7 +155,11 @@ class Manga:
 
     def page_exists(self, data):
         filename = self.get_page_filename(data)
-        return os.path.exists(filename+'.png') or os.path.exists(filename+'.jpg')
+        if os.path.exists(filename+'.png'):
+            return verify_image(open(filename+'.png', 'rb').read(), filename+'.png')
+        if os.path.exists(filename+'.jpg'):
+            return verify_image(open(filename+'.jpg', 'rb').read(), filename+'.jpg')
+        return False
 
     def zip_chapter(self, pages, data):
         filename = self.get_chapter_filename(data)
