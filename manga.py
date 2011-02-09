@@ -103,8 +103,9 @@ class Manga:
         filename = self.get_page_filename(data)
         filename += os.path.splitext(img_url)[-1].lower()
         fi = urlopen(img_url, referer=url, headers=self.http_headers)
+        content = fi.read()
         fo = open(filename, 'wb')
-        fo.write(fi.read())
+        fo.write(content)
         fo.close()
 
     def download_chapter(self, data):

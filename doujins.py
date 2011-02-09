@@ -42,8 +42,9 @@ class Doujins(Manga):
         filename = self.get_page_filename(data)
         filename += os.path.splitext(img_url)[-1].split('&')[0].lower()
         fi = urlopen(img_url)
+        content = fi.read()
         fo = open(filename, 'wb')
-        fo.write(fi.read())
+        fo.write(content)
         fo.close()
 
     def _list_chapters(self, doc):
