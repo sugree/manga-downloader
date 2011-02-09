@@ -34,7 +34,7 @@ def extract_list(s, last, extract_range=True, func=int):
     l = []
     for i in s.split(','):
         if i.endswith('+'):
-            l.extend(range(int(i[:-1]), last+1))
+            l.extend(range(int(i[:-1]), int(last)+1))
         elif extract_range and '-' in i:
             s, e = i.split('-')
             l.extend(range(int(s), int(e)+1))
