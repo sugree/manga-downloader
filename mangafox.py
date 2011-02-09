@@ -48,6 +48,11 @@ class MangaFoxApp(App):
         parser.add_option('--volume', dest='volume', default='',
                           help='Volume')
 
+    def _filter_chapter(self, data):
+        if 'volume' in self.data and data['volume'] != self.data['volume']:
+            return True
+        return App._filter_chapter(self, data)
+
 if __name__ == '__main__':
     app = MangaFoxApp()
     app.run()

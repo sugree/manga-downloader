@@ -173,6 +173,9 @@ class App:
         parser.add_option('-C', '--chapter', dest='chapter', default='',
                           help='Chapter')
 
+    def _filter_chapter(self, data):
+        return self.chapters and int(data['chapter']) not in self.chapters
+
     def download_chapter(self, data):
         pages = self.manga.download_chapter(data)
         self.manga.zip_chapter(pages, data)
@@ -188,7 +191,7 @@ class App:
                                      self.extract_range,
                                      self.chapter_func)
         for data in chapters:
-            if self.chapters and data['chapter'] not in self.chapters:
+            if self._filter_chapter(data):
                 continue
             data.update(self.data)
             if not self.manga.chapter_exists(data):
