@@ -71,12 +71,5 @@ class DoujinsApp(App):
         App._parse_args(self, parser)
 
 if __name__ == '__main__':
-    #import sys
-    #mr = BleachExile()
-    #print mr.list_chapters({'series': 'kekkaishi'})
-    #print mr.list_pages({'series': 'kekkaishi', 'chapter': 1})
-    #mr.download_page({'series': 'kekkaishi', 'chapter': 1, 'page': 1})
-    #mr.download_chapter({'series': 'kekkaishi', 'chapter': 1})
-    #sys.exit(-1)
     app = DoujinsApp()
     app.run()
