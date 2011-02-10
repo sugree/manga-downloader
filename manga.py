@@ -6,6 +6,12 @@ import urllib2
 import httplib
 import zipfile
 import socket
+import gzip
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 from lxml import etree as ET
 
@@ -34,7 +40,10 @@ def urlopen(*args, **kwargs):
 def urlretrieve(*args, **kwargs):
     try:
         f = urlopen(*args, **kwargs)
-        content = f.read()
+        if f.info().get('Content-Encoding') == 'gzip':
+            content = gzip.GzipFile(fileobj=StringIO(f.read())).read()
+        else:
+            content = f.read()
     except socket.timeout, why:
         print why, args
         content = urlretrieve(*args, **kwargs)
@@ -51,11 +60,6 @@ def extract_list(s, last, extract_range=True, func=int):
         elif i:
             l.append(func(i))
     return l
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 try:
     from PIL import Image
@@ -125,8 +129,8 @@ class Manga:
 
     def download_page(self, data):
         url = self.get_page_url(data)
-        f = urlopen(url, headers=self.http_headers)
-        doc = ET.HTML(f.read())
+        content = urlretrieve(url, headers=self.http_headers)
+        doc = ET.HTML(content)
         img_url = self._download_page(doc)
         filename = self.get_page_filename(data)
         filename += os.path.splitext(img_url)[-1].lower()
