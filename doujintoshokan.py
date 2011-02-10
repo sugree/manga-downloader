@@ -4,13 +4,18 @@ import re
 
 from manga import Manga, App
 
+def format_fixed_float(v, length=3):
+    while v.find('.') < length and len(v) < length:
+        v = '0'+v
+    return v
+
 class DoujinToshokan(Manga):
     SERIES_URL = '%(baseurl)s/series/%(series)s'
-    CHAPTER_URL = '%(baseurl)s/read/%(series)s/%(scanlator)s/%(chapter)d'
-    PAGE_URL = '%(baseurl)s/read/%(series)s/%(scanlator)s/%(chapter)d/%(page)d'
+    CHAPTER_URL = '%(baseurl)s/read/%(series)s/%(scanlator)s/%(chapter)s'
+    PAGE_URL = '%(baseurl)s/read/%(series)s/%(scanlator)s/%(chapter)s/%(page)d'
 
-    CHAPTER_PATTERN = '%(series)s-%(chapter)s-%(scanlator)s.cbz'
-    PAGE_PATTERN = '%(series)s-%(chapter)s-%(scanlator)s-%(page)02d'
+    CHAPTER_PATTERN = '%(series)s-%(chapter_label)s-%(scanlator)s.cbz'
+    PAGE_PATTERN = '%(series)s-%(chapter_label)s-%(scanlator)s-%(page)02d'
 
     def __init__(self):
         Manga.__init__(self, 'http://www.doujintoshokan.com',
@@ -18,7 +23,8 @@ class DoujinToshokan(Manga):
 
     def _list_chapters(self, doc):
         chapters = doc.xpath("//td[@class='cont_mid']/table/tr/td[2]/a")
-        chapters = [{'chapter': int(i.attrib['href'].split('/')[-1]),
+        chapters = [{'chapter': i.attrib['href'].split('/')[-1],
+                     'chapter_label': format_fixed_float(i.attrib['href'].split('/')[-1]),
                      'scanlator': i.attrib['href'].split('/')[-2]} for i in chapters]
         return chapters
 
