@@ -177,10 +177,9 @@ class Manga:
 
     def page_exists(self, data):
         filename = self.get_page_filename(data)
-        if os.path.exists(filename+'.png'):
-            return verify_image(open(filename+'.png', 'rb').read(), filename+'.png')
-        if os.path.exists(filename+'.jpg'):
-            return verify_image(open(filename+'.jpg', 'rb').read(), filename+'.jpg')
+        for ext in ['.png', '.jpg', '.gif']:
+            if os.path.exists(filename+ext):
+                return verify_image(open(filename+ext, 'rb').read(), filename+'.png')
         return False
 
     def zip_chapter(self, pages, data):
@@ -189,7 +188,7 @@ class Manga:
         for page in pages:
             data['page'] = page
             filename = self.get_page_filename(data)
-            for ext in ['.png', '.jpg']:
+            for ext in ['.png', '.jpg', '.gif']:
                 if os.path.exists(filename+ext):
                     filename += ext
                     break
@@ -199,7 +198,7 @@ class Manga:
         for page in pages:
             data['page'] = page
             filename = self.get_page_filename(data)
-            for ext in ['.png', '.jpg']:
+            for ext in ['.png', '.jpg', '.gif']:
                 if os.path.exists(filename+ext):
                     filename += ext
                     break
