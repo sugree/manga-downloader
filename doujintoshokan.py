@@ -5,7 +5,8 @@ import re
 from manga import Manga, App
 
 def format_fixed_float(v, length=3):
-    while v.find('.') < length and len(v) < length:
+    while (v.find('.') >= 0 and v.find('.') < length) or \
+          (v.find('.') < 0 and len(v) < length):
         v = '0'+v
     return v
 
