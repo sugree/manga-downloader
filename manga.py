@@ -7,6 +7,7 @@ import httplib
 import zipfile
 import socket
 import gzip
+import time
 
 try:
     from cStringIO import StringIO
@@ -17,12 +18,29 @@ from lxml import etree as ET
 
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 http_timeout = 90
+http_error_delay = 60
 
 def urlopen(*args, **kwargs):
+    ret = None
+    while ret is None:
+        ret = _urlopen(*args, **kwargs)
+        if ret is None:
+            time.sleep(http_error_delay)
+    return ret
+
+def urlretrieve(*args, **kwargs):
+    ret = None
+    while ret is None:
+        ret = _urlretrieve(*args, **kwargs)
+        if ret is None:
+            time.sleep(http_error_delay)
+    return ret
+
+def _urlopen(*args, **kwargs):
     try:
         headers = {'User-Agent': user_agent,
                    'Referer': kwargs.get('referer', args[0]),
-                   'Accept': 'text/html,application/xhtml+xml,application/xml,image/jpeg,image/png',
+                   'Accept': 'text/html,application/xhtml+xml,application/xml,image/jpeg,image/png,image/gif',
                    'Accept-Encoding': 'identity',
                    'Accept-Charset': 'utf-8',
                    'Connection': 'close'}
@@ -31,13 +49,13 @@ def urlopen(*args, **kwargs):
         ret = urllib2.urlopen(req, timeout=http_timeout)
     except httplib.BadStatusLine, why:
         print httplib.BadStatusLine, args
-        ret = urlopen(*args)
+        ret = None
     except urllib2.URLError, why:
         print why, args
-        ret = urlopen(*args)
+        ret = None
     return ret
 
-def urlretrieve(*args, **kwargs):
+def _urlretrieve(*args, **kwargs):
     try:
         f = urlopen(*args, **kwargs)
         if f.info().get('Content-Encoding') == 'gzip':
@@ -46,7 +64,7 @@ def urlretrieve(*args, **kwargs):
             content = f.read()
     except socket.timeout, why:
         print why, args
-        content = urlretrieve(*args, **kwargs)
+        content = None
     return content
 
 def extract_list(s, last, extract_range=True, func=int):
