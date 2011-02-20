@@ -120,6 +120,11 @@ class Manga:
         self.baseurl = baseurl
         self.http_headers = http_headers
 
+        self.options = {
+            'ignore_empty': False,
+            'max_retry': 60,
+        }
+
     def get_series_url(self, data):
         d = data
         d.update({'baseurl': self.baseurl})
@@ -170,10 +175,16 @@ class Manga:
         filename += os.path.splitext(img_url)[-1].lower()
 #        fi = urlopen(img_url, referer=url, headers=self.http_headers)
 #        content = fi.read()
-        while True:
+
+        count = 0
+        while count < self.options['max_retry']:
             content = urlretrieve(img_url, referer=url, headers=self.http_headers)
             if verify_image(content, img_url):
                 break
+            if len(content) == 0 and self.options['ignore_empty']:
+                print 'ignore empty', img_url
+                break
+            count += 1
         fo = open(filename, 'wb')
         fo.write(content)
         fo.close()
@@ -234,6 +245,12 @@ class App:
     def _parse_args(self, parser):
         parser.add_option('-C', '--chapter', dest='chapter', default='',
                           help='Chapter')
+        parser.add_option('--ignore-empty', dest='ignore_empty', default=False,
+                          action='store_true',
+                          help='Ignore zero-size images')
+        parser.add_option('--max-retry', dest='max_retry', default=60,
+                          type='int',
+                          help='Maximum retry for invalid images')
 
     def _filter_chapter(self, data):
         return (self.options.chapter or self.chapters) and \
@@ -247,6 +264,12 @@ class App:
     def run(self):
         if not os.path.exists(self.series):
             os.mkdir(self.series)
+
+        self.manga.options.update({
+            'ignore_empty': self.options.ignore_empty,
+            'max_retry': self.options.max_retry,
+        })
+
         chapters = self.manga.list_chapters(self.data)
         print chapters[0], chapters[-1]
         self.chapters = extract_list(self.options.chapter,
