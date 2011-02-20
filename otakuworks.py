@@ -8,14 +8,14 @@ from manga import Manga, App, urlretrieve
 
 class OtakuWorks(Manga):
     SERIES_URL = '%(baseurl)s/series/%(series_id)d/%(series)s'
-    CHAPTER_URL = '%(baseurl)s/view/%(chapter_id)d/%(series)s/chp-%(chapter)s/read'
-    PAGE_URL = '%(baseurl)s/view/%(chapter_id)d/%(series)s/chp-%(chapter)s/read/%(page)d'
+    CHAPTER_URL = '%(baseurl)s/view/%(chapter_id)d/%(series)s/%(chapter_label)s/read'
+    PAGE_URL = '%(baseurl)s/view/%(chapter_id)d/%(series)s/%(chapter_label)s/read/%(page)d'
 
-    CHAPTER_CRE = re.compile(r'/view/(\d+)/[^/]+/chp-([0-9-]+)$')
+    CHAPTER_CRE = re.compile(r'/view/(?P<chapter_id>\d+)/[^/]+/(?P<chapter_label>(vol-(?P<volume>\d+)-?)?(chp-(?P<chapter>[0-9-]+))?)$')
     PAGE_CRE = re.compile(r"create_jsnumsel2\('fpage1',(\d+),(\d+),\d+,\d+\);")
 
-    CHAPTER_PATTERN = '%(series)s-%(chapter)s.cbz'
-    PAGE_PATTERN = '%(series)s-%(chapter)s-%(page)02d'
+    CHAPTER_PATTERN = '%(series)s-%(chapter_label)s.cbz'
+    PAGE_PATTERN = '%(series)s-%(chapter_label)s-%(page)02d'
 
     def __init__(self):
         Manga.__init__(self, 'http://www.otakuworks.com')
@@ -32,15 +32,17 @@ class OtakuWorks(Manga):
             content = urlretrieve(url)
             doc = ET.HTML(content)
             chapters += self._list_chapters(doc)
-        chapters.sort(lambda a, b: cmp(a['chapter'], b['chapter']))
+        chapters.sort(lambda a, b: cmp(a['chapter_label'], b['chapter_label']))
         return chapters
 
     def _list_chapters(self, doc):
         chapters = []
         for n in doc.xpath("//div[@id='filelist']/div/a"):
             m = self.CHAPTER_CRE.match(n.attrib['href'])
-            chapters.append({'chapter_id': int(m.group(1)),
-                             'chapter': m.group(2)})
+            chapters.append({'chapter_id': int(m.group('chapter_id')),
+                             'chapter_label': m.group('chapter_label'),
+                             'chapter': m.group('chapter'),
+                             'volume': m.group('volume')})
         return chapters
 
     def _list_pages(self, doc):
