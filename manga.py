@@ -67,14 +67,25 @@ def _urlretrieve(*args, **kwargs):
         content = None
     return content
 
-def extract_list(s, last, extract_range=True, func=int):
+def extract_list(s, chapters, extract_range=True, func=int):
     l = []
     for i in s.split(','):
         if i.endswith('+'):
-            l.extend(range(int(i[:-1]), int(last)+1))
+            try:
+                s = chapters.index(func(i[:-1]))
+                l.extend(chapters[s:])
+#                l.extend(range(int(i[:-1]), int(last)+1))
+            except ValueError:
+                pass
         elif extract_range and '-' in i:
-            s, e = i.split('-')
-            l.extend(range(int(s), int(e)+1))
+            try:
+                s, e = i.split('-')
+                s = chapters.index(func(s))
+                e = chapters.index(func(e))
+                l.extend(chapters[s:e+1])
+#                l.extend(range(int(s), int(e)+1))
+            except ValueError:
+                pass
         elif i:
             l.append(func(i))
     return l
@@ -220,7 +231,8 @@ class App:
                           help='Chapter')
 
     def _filter_chapter(self, data):
-        return self.chapters and int(data['chapter']) not in self.chapters
+        return (self.options.chapter or self.chapters) and \
+               self.chapter_func(data['chapter']) not in self.chapters
 
     def download_chapter(self, data):
         pages = self.manga.download_chapter(data)
@@ -233,7 +245,7 @@ class App:
         chapters = self.manga.list_chapters(self.data)
         print chapters[0], chapters[-1]
         self.chapters = extract_list(self.options.chapter,
-                                     chapters[-1]['chapter'],
+                                     [c['chapter'] for c in chapters],
                                      self.extract_range,
                                      self.chapter_func)
         for data in chapters:
