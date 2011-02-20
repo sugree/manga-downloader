@@ -15,7 +15,7 @@ class OtakuWorks(Manga):
     PAGE_CRE = re.compile(r"create_jsnumsel2\('fpage1',(\d+),(\d+),\d+,\d+\);")
 
     CHAPTER_PATTERN = '%(series)s-%(chapter_label)s.cbz'
-    PAGE_PATTERN = '%(series)s-%(chapter_label)s-%(page)02d'
+    PAGE_PATTERN = '%(series)s-%(chapter_label)s-%(page)03d'
 
     def __init__(self):
         Manga.__init__(self, 'http://www.otakuworks.com')
