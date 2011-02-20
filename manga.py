@@ -142,16 +142,16 @@ class Manga:
 
     def list_chapters(self, data):
         url = self.get_series_url(data)
-        f = urlopen(url, headers=self.http_headers)
-        doc = ET.HTML(f.read())
+        content = urlretrieve(url, headers=self.http_headers)
+        doc = ET.HTML(content)
         chapters = self._list_chapters(doc)
         chapters.sort(lambda a, b: cmp(a['chapter'], b['chapter']))
         return chapters
 
     def list_pages(self, data):
         url = self.get_chapter_url(data)
-        f = urlopen(url, headers=self.http_headers)
-        doc = ET.HTML(f.read())
+        content = urlretrieve(url, headers=self.http_headers)
+        doc = ET.HTML(content)
         pages = self._list_pages(doc)
         pages.sort()
         return pages

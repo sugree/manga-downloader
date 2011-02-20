@@ -21,15 +21,15 @@ class Doujins(Manga):
 
     def list_chapters(self, data):
         url = self.get_series_url(data)
-        f = urlopen(url)
-        doc = ET.HTML(f.read())
+        content = urlretrieve(url)
+        doc = ET.HTML(content)
         chapters = self._list_chapters(doc)
         pages = [self.baseurl+n.attrib['href'] \
                  for n in filter(lambda n: n.attrib['href'].startswith('/search.php?series='),
                                  doc.xpath("//a"))]
         for url in pages:
-            f = urlopen(url)
-            doc = ET.HTML(f.read())
+            content = urlretrieve(url)
+            doc = ET.HTML(content)
             chapters += self._list_chapters(doc)
         chapters.sort(lambda a, b: cmp(a['chapter'], b['chapter']))
         return chapters
