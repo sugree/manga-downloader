@@ -50,6 +50,11 @@ def _urlopen(*args, **kwargs):
     except httplib.BadStatusLine, why:
         print httplib.BadStatusLine, args
         ret = None
+    except urllib2.HTTPError, why:
+        print why, args
+        ret = None
+        if why.code == 404 and kwargs.get('raise404', False):
+            raise why
     except urllib2.URLError, why:
         print why, args
         ret = None
