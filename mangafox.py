@@ -38,7 +38,7 @@ class MangaFox(Manga):
 
 class MangaFoxApp(App):
     def __init__(self):
-        App.__init__(self)
+        App.__init__(self, chapter_func=str)
         if self.options.volume:
             self.data.update({'volume': int(self.options.volume)})
         self.manga = MangaFox()
