@@ -53,7 +53,7 @@ class OtakuWorks(Manga):
         return pages
 
     def _download_page(self, doc):
-        url = doc.xpath("//div[@id='filelist']/a/img")[0].attrib['src']
+        url = doc.xpath("//div[@id='filelist']/a/img | //div[@id='filelist']/img")[0].attrib['src']
         url = url.replace(' ', '%20')
         return url
 
