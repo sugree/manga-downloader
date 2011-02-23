@@ -6,7 +6,7 @@ from urllib import unquote_plus
 
 from lxml import etree as ET
 
-from manga import Manga, App, urlopen, urlretrieve
+from manga import Manga, App, urlopen, urlretrieve, smart_cmp
 
 class Doujins(Manga):
     SERIES_URL = '%(baseurl)s/search.php?series=%(series)s&page=1'
@@ -31,7 +31,7 @@ class Doujins(Manga):
             content = urlretrieve(url)
             doc = ET.HTML(content)
             chapters += self._list_chapters(doc)
-        chapters.sort(lambda a, b: cmp(a['chapter'], b['chapter']))
+        chapters.sort(lambda a, b: smart_cmp(a['chapter'], b['chapter']))
         return chapters
 
     def download_page(self, data):

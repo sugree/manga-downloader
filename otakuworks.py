@@ -4,7 +4,7 @@ import re
 
 from lxml import etree as ET
 
-from manga import Manga, App, urlretrieve
+from manga import Manga, App, urlretrieve, smart_cmp
 
 class OtakuWorks(Manga):
     SERIES_URL = '%(baseurl)s/series/%(series_id)d/%(series)s'
@@ -32,7 +32,7 @@ class OtakuWorks(Manga):
             content = urlretrieve(url)
             doc = ET.HTML(content)
             chapters += self._list_chapters(doc)
-        chapters.sort(lambda a, b: cmp(a['chapter_label'], b['chapter_label']))
+        chapters.sort(lambda a, b: smart_cmp(a['chapter_label'], b['chapter_label']))
         return chapters
 
     def _list_chapters(self, doc):

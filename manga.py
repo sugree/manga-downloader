@@ -72,6 +72,12 @@ def _urlretrieve(*args, **kwargs):
         content = None
     return content
 
+def smart_cmp(a, b):
+    cre = re.compile(r'[^\d]')
+    a = map(int, filter(lambda s: len(s) > 0, cre.split(str(a))))
+    b = map(int, filter(lambda s: len(s) > 0, cre.split(str(b))))
+    return cmp(a, b)
+
 def extract_list(s, chapters, extract_range=True, func=int):
     l = []
     for i in s.split(','):
@@ -155,7 +161,7 @@ class Manga:
         content = urlretrieve(url, headers=self.http_headers)
         doc = ET.HTML(content)
         chapters = self._list_chapters(doc)
-        chapters.sort(lambda a, b: cmp(a['chapter'], b['chapter']))
+        chapters.sort(lambda a, b: smart_cmp(a['chapter'], b['chapter']))
         return chapters
 
     def list_pages(self, data):

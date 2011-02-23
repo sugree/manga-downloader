@@ -7,11 +7,11 @@ from manga import Manga, App
 class Animea(Manga):
 
     SERIES_URL = '%(baseurl)s/%(series)s.html?skip=1'
-    CHAPTER_URL = '%(baseurl)s/%(series)s-chapter-%(chapter)d-page-1.html'
-    PAGE_URL = '%(baseurl)s/%(series)s-chapter-%(chapter)d-page-%(page)d.html'
+    CHAPTER_URL = '%(baseurl)s/%(series)s-chapter-%(chapter)s-page-1.html'
+    PAGE_URL = '%(baseurl)s/%(series)s-chapter-%(chapter)s-page-%(page)d.html'
 
-    CHAPTER_PATTERN = '%(series)s-%(chapter)03d.cbz'
-    PAGE_PATTERN = '%(series)s-%(chapter)03d-%(page)03d'
+    CHAPTER_PATTERN = '%(series)s-%(chapter)s.cbz'
+    PAGE_PATTERN = '%(series)s-%(chapter)s-%(page)03d'
 
     CHAPTER_CRE = re.compile(r'-chapter-(?P<chapter>[^.]+)\.html$')
 
@@ -23,7 +23,7 @@ class Animea(Manga):
         for n in doc.xpath("//table[@id='chapterslist']/tr[position()>1]")[:-1]:
             u = n.xpath("td[2]/a")[0].attrib['href']
             m = self.CHAPTER_CRE.search(u)
-            chapters.append({'chapter': int(m.group('chapter'))})
+            chapters.append({'chapter': m.group('chapter')})
         return chapters
 
     def _list_pages(self, doc):
@@ -37,7 +37,7 @@ class Animea(Manga):
 
 class AnimeaApp(App):
     def __init__(self):
-        App.__init__(self)
+        App.__init__(self, chapter_func=str)
         self.manga = Animea()
 
     def _parse_args(self, parser):
