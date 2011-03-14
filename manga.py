@@ -178,7 +178,15 @@ class Manga:
         doc = ET.HTML(content)
         img_url = self._download_page(doc)
         filename = self.get_page_filename(data)
-        filename += os.path.splitext(img_url)[-1].lower()
+        ext = os.path.splitext(img_url)[-1].lower()
+        if not ext:
+            if img_url.lower().find('jpg') >= 0:
+                ext = '.jpg'
+            elif img_url.lower().find('png') >= 0:
+                ext = '.png'
+            else:
+                ext = '.jpg'
+        filename += ext
 #        fi = urlopen(img_url, referer=url, headers=self.http_headers)
 #        content = fi.read()
 
