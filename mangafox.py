@@ -21,7 +21,7 @@ class MangaFox(Manga):
     def _list_chapters(self, doc):
         chapters = []
         for n in doc.xpath("//table[@id='listing']/tr[position()>1]"):
-            u = n.xpath("td[1]/a[@class='chico']")[0].attrib['href']
+            u = n.xpath("td[1]/a[@class='ch']")[0].attrib['href']
             m = self.CHAPTER_CRE.match(u)
             chapters.append({'volume': int(m.group(1)),
                              'chapter': m.group(2)})
