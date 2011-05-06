@@ -67,6 +67,9 @@ def _urlretrieve(*args, **kwargs):
             content = gzip.GzipFile(fileobj=StringIO(f.read())).read()
         else:
             content = f.read()
+    except socket.error, why:
+        print why, args
+        content = None
     except socket.timeout, why:
         print why, args
         content = None
