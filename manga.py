@@ -287,6 +287,7 @@ class App:
             'max_retry': self.options.max_retry,
         })
 
+        print self.series
         chapters = self.manga.list_chapters(self.data)
         print chapters[0], chapters[-1]
         self.chapters = extract_list(self.options.chapter,
