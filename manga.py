@@ -217,7 +217,15 @@ class Manga:
 
     def chapter_exists(self, data):
         filename = self.get_chapter_filename(data)
-        return os.path.exists(filename)
+        if not os.path.exists(filename):
+            return False
+        fi = zipfile.ZipFile(filename, 'r')
+        for fname in fi.namelist():
+            if not verify_image(fi.open(fname, 'r').read(), fname):
+                self.unzip_chapter(data)
+                os.unlink(filename)
+                return False
+        return True
 
     def page_exists(self, data):
         filename = self.get_page_filename(data)
@@ -225,6 +233,12 @@ class Manga:
             if os.path.exists(filename+ext):
                 return verify_image(open(filename+ext, 'rb').read(), filename+'.png')
         return False
+
+    def unzip_chapter(self, data):
+        filename = self.get_chapter_filename(data)
+        fi = zipfile.ZipFile(filename, 'r')
+        for fname in fi.namelist():
+            fi.extract(fname)
 
     def zip_chapter(self, pages, data):
         filename = self.get_chapter_filename(data)
