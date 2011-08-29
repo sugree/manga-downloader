@@ -108,7 +108,7 @@ try:
     from PIL import Image
     def verify_image(s, uri):
         try:
-            Image.open(StringIO(s))
+            Image.open(StringIO(s)).load()
         except IOError, why:
             print why, uri
             return False
