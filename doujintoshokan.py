@@ -40,7 +40,7 @@ class DoujinToshokan(Manga):
 
 class DoujinToshokanApp(App):
     def __init__(self):
-        App.__init__(self)
+        App.__init__(self, chapter_func=str)
         self.manga = DoujinToshokan()
 
     def _parse_args(self, parser):
