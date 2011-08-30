@@ -109,7 +109,7 @@ try:
     def verify_image(s, uri):
         try:
             Image.open(StringIO(s)).load()
-        except IOError, why:
+        except Exception, why:
             print why, uri
             return False
         return True
@@ -221,6 +221,8 @@ class Manga:
             return False
         fi = zipfile.ZipFile(filename, 'r')
         for fname in fi.namelist():
+            if fname.endswith('/'):
+                continue
             if not verify_image(fi.open(fname, 'r').read(), fname):
                 self.unzip_chapter(data)
                 os.unlink(filename)

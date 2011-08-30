@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import re
+import os
 
 from manga import Manga, App, urlretrieve
 
@@ -33,6 +34,10 @@ class StopTazmo(Manga):
         fo = open(filename, 'wb')
         fo.write(content)
         fo.close()
+
+    def chapter_exists(self, data):
+        filename = self.get_chapter_filename(data)
+        return os.path.exists(filename)
 
     def zip_chapter(self, pages, data):
         pass
