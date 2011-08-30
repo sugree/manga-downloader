@@ -232,8 +232,12 @@ class Manga:
     def page_exists(self, data):
         filename = self.get_page_filename(data)
         for ext in ['.png', '.jpg', '.gif']:
-            if os.path.exists(filename+ext):
-                return verify_image(open(filename+ext, 'rb').read(), filename+'.png')
+            fname = filename+ext
+            if os.path.exists(fname):
+                if not verify_image(open(fname, 'rb').read(), fname):
+                    os.unlink(fname)
+                else:
+                    return True
         return False
 
     def unzip_chapter(self, data):
@@ -261,7 +265,6 @@ class Manga:
             for ext in ['.png', '.jpg', '.gif']:
                 if os.path.exists(filename+ext):
                     filename += ext
-                    break
             os.unlink(filename)
 
 class App:
