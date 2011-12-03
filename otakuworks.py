@@ -11,7 +11,7 @@ class OtakuWorks(Manga):
     CHAPTER_URL = '%(baseurl)s/view/%(chapter_id)d/%(series)s/%(chapter_label)s/read'
     PAGE_URL = '%(baseurl)s/view/%(chapter_id)d/%(series)s/%(chapter_label)s/read/%(page)d'
 
-    CHAPTER_CRE = re.compile(r'/view/(?P<chapter_id>\d+)/[^/]+/(?P<chapter_label>(vol-(?P<volume>\d+)-?)?(chp-(?P<chapter>[0-9-]+))?)$')
+    CHAPTER_CRE = re.compile(r'/view/(?P<chapter_id>\d+)/[^/]+/(?P<chapter_label>(vol-(?P<volume>\d+)-?)?(chp-(?P<chapter>[0-9-]+))?)/read$')
     PAGE_CRE = re.compile(r"create_jsnumsel2\('fpage1',(\d+),(\d+),\d+,\d+\);")
 
     CHAPTER_PATTERN = '%(series)s-%(chapter_label)s.cbz'
