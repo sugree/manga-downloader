@@ -9,7 +9,7 @@ class MangaReader(Manga):
     CHAPTER_URL = '%(baseurl)s/%(series_id)d-%(chapter_id)d-1/%(series)s/chapter-%(chapter)d.html'
     PAGE_URL = '%(baseurl)s/%(series_id)d-%(chapter_id)d-%(page)d/%(series)s/chapter-%(chapter)d.html'
 
-    NEW_SERIES_URL = '%(baseurl)s/%(series)s.html'
+    NEW_SERIES_URL = '%(baseurl)s/%(series)s'
     NEW_CHAPTER_URL = '%(baseurl)s/%(series)s/%(chapter)d'
     NEW_PAGE_URL = '%(baseurl)s/%(series)s/%(chapter)d/%(page)d'
 
