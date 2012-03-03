@@ -29,6 +29,7 @@ class MangaFox(Manga):
 
     def _list_pages(self, doc):
         pages = doc.xpath("//div[@id='top_center_bar']/form/div/div/select/option")
+        pages = filter(lambda i: i.text != 'Comments', pages)
         pages = [int(i.text) for i in pages]
         return pages
 
