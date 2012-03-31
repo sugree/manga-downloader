@@ -23,6 +23,9 @@ class MangaFox(Manga):
         for l in doc.xpath("//div[@id='chapters']/ul[@class='chlist']/li/div//a[@class='tips']"):
             u = l.attrib['href']
             m = self.CHAPTER_CRE.search(u)
+            if not m:
+                print 'unsupported url', u
+                continue
             chapters.append({'volume': int(m.group(1)),
                              'chapter': m.group(2)})
         return chapters
