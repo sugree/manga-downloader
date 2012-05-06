@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 import re
 from optparse import OptionParser
@@ -48,15 +50,15 @@ def _urlopen(*args, **kwargs):
         req = urllib2.Request(*args, headers=headers)
         ret = urllib2.urlopen(req, timeout=http_timeout)
     except httplib.BadStatusLine, why:
-        print httplib.BadStatusLine, args
+        print(httplib.BadStatusLine, args)
         ret = None
     except urllib2.HTTPError, why:
-        print why, args
+        print(why, args)
         ret = None
         if why.code == 404 and kwargs.get('raise404', False):
             raise why
     except urllib2.URLError, why:
-        print why, args
+        print(why, args)
         ret = None
     return ret
 
@@ -68,10 +70,10 @@ def _urlretrieve(*args, **kwargs):
         else:
             content = f.read()
     except socket.error, why:
-        print why, args
+        print(why, args)
         content = None
     except socket.timeout, why:
-        print why, args
+        print(why, args)
         content = None
     return content
 
@@ -110,7 +112,7 @@ try:
         try:
             Image.open(StringIO(s)).load()
         except Exception, why:
-            print why, uri
+            print(why, uri)
             return False
         return True
 except ImportError:
@@ -199,7 +201,7 @@ class Manga:
             if verify_image(content, img_url):
                 break
             if len(content) == 0 and self.options['ignore_empty']:
-                print 'ignore empty', img_url
+                print('ignore empty', img_url)
                 break
             count += 1
         fo = open(filename, 'wb')
@@ -210,7 +212,7 @@ class Manga:
         pages = self.list_pages(data)
         for page in pages:
             data['page'] = page
-            print data
+            print(data)
             if not self.page_exists(data):
                 self.download_page(data)
         return pages
@@ -306,9 +308,9 @@ class App:
             'max_retry': self.options.max_retry,
         })
 
-        print self.series
+        print(self.series)
         chapters = self.manga.list_chapters(self.data)
-        print chapters[0], chapters[-1]
+        print(chapters[0], chapters[-1])
         self.chapters = extract_list(self.options.chapter,
                                      [c['chapter'] for c in chapters],
                                      self.extract_range,

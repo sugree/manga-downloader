@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+
 import re
 import os
 
@@ -27,7 +29,7 @@ class StopTazmo(Manga):
         return chapters
 
     def download_chapter(self, data):
-        print data
+        print(data)
         filename = self.get_chapter_filename(data)
         url = data['chapter_url']
         content = urlretrieve(url, headers=self.http_headers)

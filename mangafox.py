@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+
 import re
 
 from manga import Manga, App
@@ -24,7 +26,7 @@ class MangaFox(Manga):
             u = l.attrib['href']
             m = self.CHAPTER_CRE.search(u)
             if not m:
-                print 'unsupported url', u
+                print('unsupported url', u)
                 continue
             chapters.append({'volume': int(m.group(1)),
                              'chapter': m.group(2)})
