@@ -306,8 +306,9 @@ class App:
 
     def download_chapter(self, data):
         pages = self.manga.download_chapter(data)
-        self.manga.zip_chapter(pages, data)
-        self.manga.remove_chapter(pages, data)
+        if pages:
+            self.manga.zip_chapter(pages, data)
+            self.manga.remove_chapter(pages, data)
 
     def run(self):
         if not os.path.exists(self.series):
