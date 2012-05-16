@@ -41,20 +41,26 @@ def urlretrieve(*args, **kwargs):
 def _urlopen(*args, **kwargs):
     try:
         headers = {'User-Agent': user_agent,
-                   'Referer': kwargs.get('referer', args[0]),
                    'Accept': 'text/html,application/xhtml+xml,application/xml,image/jpeg,image/png,image/gif',
                    'Accept-Encoding': 'identity',
                    'Accept-Charset': 'utf-8',
                    'Connection': 'close'}
         headers.update(kwargs.get('headers', {}))
+        if kwargs.get('auto_referer', True):
+            headers.update({'Referer': kwargs.get('referer', args[0])})
+        headers = dict((k, v) for k, v in headers.iteritems() if v is not None)
+
         req = urllib2.Request(*args, headers=headers)
         ret = urllib2.urlopen(req, timeout=http_timeout)
     except httplib.BadStatusLine, why:
         print(httplib.BadStatusLine, args)
         ret = None
     except urllib2.HTTPError, why:
-        print(why, args)
-        ret = None
+        if why.code == 500 and kwargs.get('ignore500', False):
+            ret = why
+        else:
+            print(why, args)
+            ret = None
         if why.code == 404 and kwargs.get('raise404', False):
             raise why
     except urllib2.URLError, why:
@@ -134,6 +140,10 @@ class Manga:
         self.options = {
             'ignore_empty': False,
             'max_retry': 60,
+            'urlopen_args': {
+                'headers': self.http_headers,
+                'auto_referer': True,
+            },
         }
 
     def get_series_url(self, data):
@@ -163,7 +173,7 @@ class Manga:
 
     def list_chapters(self, data):
         url = self.get_series_url(data)
-        content = urlretrieve(url, headers=self.http_headers)
+        content = urlretrieve(url, **self.options['urlopen_args'])
         doc = ET.HTML(content)
         chapters = self._list_chapters(doc)
         chapters.sort(lambda a, b: smart_cmp(a['chapter'], b['chapter']))
@@ -171,7 +181,7 @@ class Manga:
 
     def list_pages(self, data):
         url = self.get_chapter_url(data)
-        content = urlretrieve(url, headers=self.http_headers)
+        content = urlretrieve(url, **self.options['urlopen_args'])
         doc = ET.HTML(content)
         pages = self._list_pages(doc)
         pages.sort()
@@ -179,7 +189,7 @@ class Manga:
 
     def download_page(self, data):
         url = self.get_page_url(data)
-        content = urlretrieve(url, headers=self.http_headers)
+        content = urlretrieve(url, **self.options['urlopen_args'])
         doc = ET.HTML(content)
         img_url = self._download_page(doc)
         filename = self.get_page_filename(data)
@@ -197,7 +207,7 @@ class Manga:
 
         count = 0
         while count < self.options['max_retry']:
-            content = urlretrieve(img_url, referer=url, headers=self.http_headers)
+            content = urlretrieve(img_url, referer=url, **self.options['urlopen_args'])
             if verify_image(content, img_url):
                 break
             if len(content) == 0 and self.options['ignore_empty']:
