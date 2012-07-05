@@ -194,7 +194,7 @@ class Manga:
         img_url = self._download_page(doc)
         filename = self.get_page_filename(data)
         ext = os.path.splitext(img_url)[-1].lower()
-        if not ext:
+        if not ext or ext.find('?') >= 0:
             if img_url.lower().find('jpg') >= 0:
                 ext = '.jpg'
             elif img_url.lower().find('png') >= 0:
