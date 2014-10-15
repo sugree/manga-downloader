@@ -19,6 +19,12 @@ class NiceOppai(Manga):
     def __init__(self):
         Manga.__init__(self, 'http://www.niceoppai.net')
 
+        self.options['urlopen_args'].update({
+            'raise404': True,
+            'raise503': True,
+            'raisebad': True,
+        })
+
     def list_chapters(self, data):
         url = self.get_series_url(data)
         content = urlretrieve(url)

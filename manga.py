@@ -55,12 +55,16 @@ def _urlopen(*args, **kwargs):
     except httplib.BadStatusLine, why:
         print(httplib.BadStatusLine, args)
         ret = None
+        if kwargs.get('raisebad', False):
+            raise why
     except urllib2.HTTPError, why:
         if why.code == 500 and kwargs.get('ignore500', False):
             ret = why
         else:
             print(why, args)
             ret = None
+        if why.code == 503 and kwargs.get('raise503', False):
+            raise why
         if why.code == 404 and kwargs.get('raise404', False):
             raise why
     except urllib2.URLError, why:
@@ -207,7 +211,14 @@ class Manga:
 
         count = 0
         while count < self.options['max_retry']:
-            content = urlretrieve(img_url, referer=url, **self.options['urlopen_args'])
+            try:
+                content = urlretrieve(img_url, referer=url, **self.options['urlopen_args'])
+            except httplib.BadStatusLine:
+                print('ignore bad status', img_url)
+                break
+            except urllib2.HTTPError:
+                print('ignore http error', img_url)
+                break
             if verify_image(content, img_url):
                 break
             if len(content) == 0 and self.options['ignore_empty']:
