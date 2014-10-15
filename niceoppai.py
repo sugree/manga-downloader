@@ -8,13 +8,13 @@ from manga import Manga, App, urlretrieve, smart_cmp
 
 class NiceOppai(Manga):
     SERIES_URL = '%(baseurl)s/%(series)s/'
-    CHAPTER_URL = '%(baseurl)s/%(series)s/%(chapter_id)d/'
-    PAGE_URL = '%(baseurl)s/%(series)s/%(chapter_id)d/%(page)d/'
+    CHAPTER_URL = '%(baseurl)s/%(series)s/%(chapter_id)s/'
+    PAGE_URL = '%(baseurl)s/%(series)s/%(chapter_id)s/%(page)s/'
 
-    CHAPTER_CRE = re.compile(r'.*/[^/]+/(?P<chapter_id>[0-9-]+)/$')
+    CHAPTER_CRE = re.compile(r'.*/[^/]+/(?P<chapter_id>[0-9-.]+)/$')
 
-    CHAPTER_PATTERN = '%(series)s-%(chapter_id)03d.cbz'
-    PAGE_PATTERN = '%(series)s-%(chapter_id)03d-%(page)03d'
+    CHAPTER_PATTERN = '%(series)s-%(chapter_id)03s.cbz'
+    PAGE_PATTERN = '%(series)s-%(chapter_id)03s-%(page)03s'
 
     def __init__(self):
         Manga.__init__(self, 'http://www.niceoppai.net')
@@ -37,14 +37,14 @@ class NiceOppai(Manga):
         chapters = []
         for n in doc.xpath("//div[@id='sct_content']/div/div/ul/li/a"):
             m = self.CHAPTER_CRE.match(n.attrib['href'])
-            chapters.append({'chapter_id': int(m.group('chapter_id')),
+            chapters.append({'chapter_id': m.group('chapter_id'),
                              'chapter': m.group('chapter_id').zfill(3),
                              'chapter_label': m.group('chapter_id').zfill(3)})
         return chapters
 
     def _list_pages(self, doc):
         pages = doc.xpath("//select[@class='cbo_wpm_pag']/option")
-        pages = set([int(i.text) for i in pages])
+        pages = set([i.text for i in pages])
         pages = list(pages)
         pages.sort()
         return pages
