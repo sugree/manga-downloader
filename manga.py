@@ -290,6 +290,43 @@ class Manga:
                     filename += ext
             os.unlink(filename)
 
+class MangaWithVol(Manga):
+
+    NV_CHAPTER_URL = ''
+    NV_PAGE_URL = ''
+    NV_CHAPTER_CRE = re.compile(r'')
+
+    def __init__(self, baseurl, http_headers={}):
+        Manga.__init__(self, baseurl, http_headers)
+
+    def get_chapter_url(self, data):
+        if 'volume' in data:
+            return Manga.get_chapter_url(self, data)
+        d = data
+        d.update({'baseurl': self.baseurl})
+        return self.NV_CHAPTER_URL % d
+
+    def get_page_url(self, data):
+        if 'volume' in data:
+            return Manga.get_page_url(self, data)
+        d = data
+        d.update({'baseurl': self.baseurl})
+        return self.NV_PAGE_URL % d
+
+    def get_chapter_filename(self, data):
+        if 'volume' in data:
+            return Manga.get_chapter_filename(self, data)
+        d = data
+        d.update({'baseurl': self.baseurl})
+        return os.path.join(data['series'], self.NV_CHAPTER_PATTERN % d)
+
+    def get_page_filename(self, data):
+        if 'volume' in data:
+            return Manga.get_page_filename(self, data)
+        d = data
+        d.update({'baseurl': self.baseurl})
+        return os.path.join(data['series'], self.NV_PAGE_PATTERN % d)
+
 class App:
     def __init__(self, extract_range=True, chapter_func=int):
         parser = OptionParser()
