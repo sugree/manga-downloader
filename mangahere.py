@@ -4,20 +4,25 @@ import re
 
 from lxml import etree as ET
 
-from manga import Manga, App, urlretrieve, smart_cmp
+from manga import MangaWithVol, App, urlretrieve, smart_cmp
 
-class MangaHere(Manga):
+class MangaHere(MangaWithVol):
     SERIES_URL = '%(baseurl)s/manga/%(series)s/'
-    CHAPTER_URL = '%(baseurl)s/manga/%(series)s/c%(chapter_id)s/'
-    PAGE_URL = '%(baseurl)s/manga/%(series)s/c%(chapter_id)s/%(page)s.html'
-
-    CHAPTER_CRE = re.compile(r'.*/[^/]+/c(?P<chapter_id>[0-9-.]+)/$')
-
+    CHAPTER_URL = '%(baseurl)s/manga/%(series)s/v%(volume)s/c%(chapter_id)s/'
+    PAGE_URL = '%(baseurl)s/manga/%(series)s/v%(volume)s/c%(chapter_id)s/%(page)s.html'
+    CHAPTER_CRE = re.compile(r'.*/[^/]+/v(?P<volume>[0-9-.]+)/c(?P<chapter_id>[0-9-.]+)/$')
     CHAPTER_PATTERN = '%(series)s-%(chapter_id)03s.cbz'
     PAGE_PATTERN = '%(series)s-%(chapter_id)03s-%(page)03s'
 
+    NV_CHAPTER_URL = '%(baseurl)s/manga/%(series)s/c%(chapter_id)s/'
+    NV_PAGE_URL = '%(baseurl)s/manga/%(series)s/c%(chapter_id)s/%(page)s.html'
+    NV_CHAPTER_CRE = re.compile(r'.*/[^/]+/c(?P<chapter_id>[0-9-.]+)/$')
+
+    NV_CHAPTER_PATTERN = CHAPTER_PATTERN
+    NV_PAGE_PATTERN = PAGE_PATTERN
+
     def __init__(self):
-        Manga.__init__(self, 'http://www.mangahere.co')
+        MangaWithVol.__init__(self, 'http://www.mangahere.co')
 
     def list_chapters(self, data):
         url = self.get_series_url(data)
@@ -37,9 +42,19 @@ class MangaHere(Manga):
         chapters = []
         for n in doc.xpath("//div[@class='detail_list']/ul/li/span/a"):
             m = self.CHAPTER_CRE.match(n.attrib['href'])
-            chapters.append({'chapter_id': m.group('chapter_id'),
+            if m:
+                chapters.append({'chapter_id': m.group('chapter_id'),
+                             'chapter': m.group('chapter_id').zfill(3),
+                             'volume': m.group('volume').zfill(2),
+                             'chapter_label': m.group('chapter_id').zfill(3)})
+                continue
+
+            m = self.NV_CHAPTER_CRE.match(n.attrib['href'])
+            if m:
+                chapters.append({'chapter_id': m.group('chapter_id'),
                              'chapter': m.group('chapter_id').zfill(3),
                              'chapter_label': m.group('chapter_id').zfill(3)})
+                continue
         return chapters
 
     def _list_pages(self, doc):
@@ -60,6 +75,15 @@ class MangaHereApp(App):
         App.__init__(self, chapter_func=str)
         self.manga = MangaHere()
 
+    def _parse_args(self, parser):
+        App._parse_args(self, parser)
+        parser.add_option('--volume', dest='volume', default='',
+                          help='Volume')
+
+    def _filter_chapter(self, data):
+        if 'volume' in self.data and data['volume'] != self.data['volume']:
+            return True
+        return App._filter_chapter(self, data)
 if __name__ == '__main__':
     #import sys
     #mr = MangaHere()
